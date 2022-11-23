@@ -2,9 +2,6 @@ import pandas as pd
 import joblib
 import streamlit as st
 
-'''atp tour --> players --> ranking breakdown
-bet 365'''
-
 
 prev = st.container()
 
