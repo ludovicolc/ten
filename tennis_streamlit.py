@@ -65,8 +65,8 @@ def dati(A_B365, A_Pts, A_Rank, B_B365, B_Pts, B_Rank,
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    A_B365 = st.number_input(label='A_B365')
-    A_Pts = st.number_input(label='A_Pts')
+    A_B365 = st.number_input(label='A_Bet365')
+    A_Pts = st.number_input(label='A_Punti_ATP')
     A_Rank = st.number_input(label='A_Rank')
     A_dob = st.number_input(label='A_età')
     A_height = st.number_input(label='A_altezza')
@@ -78,8 +78,8 @@ with col1:
     A_ioc_sud_america = st.number_input(label='A_nazionalità_sud_america', value=0)
     
 with col2:
-    B_B365 = st.number_input(label='B_B365')
-    B_Pts = st.number_input(label='B_Pts')
+    B_B365 = st.number_input(label='B_Bet365')
+    B_Pts = st.number_input(label='B_Punti_ATP')
     B_Rank = st.number_input(label='B_Rank')
     B_dob = st.number_input(label='B_età')
     B_height = st.number_input(label='B_altezza')
@@ -104,6 +104,8 @@ with col3:
     Round_Round_Robin = st.number_input(label='round_robin', value=0)
     Round_Semifinals = st.number_input(label='round_semifinali', value=0)
     Round_The_Final = st.number_input(label='round_finale', value=0)
+    
+    puntata = st.number_input(label='Puntata', value=0)
 
     prevedere = dati(A_B365=A_B365, A_Pts=A_Pts, A_Rank=A_Rank, B_B365=B_B365, B_Pts=B_Pts, B_Rank=B_Rank, Date=Date, 
                     A_dob=A_dob, A_height=A_height, B_dob=B_dob, B_height=B_height,
@@ -136,5 +138,6 @@ with col3:
         kelly_2 = ((b*p - q) / b) / 2
         
         st.text(f'Kelly: {round(kelly*100, 2)}% | Kelly_2: {round(kelly_2*100, 2)}%    Quota 1:{b}')
+        st.text(f'Puntata_1: {round(kelly*puntata, 2)} | Puntata_2: {round(kelly_2*puntata, 2)}')
 
     st.button('Prevedi', on_click=previsione)
