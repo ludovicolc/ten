@@ -11,11 +11,14 @@ players = soup.find_all('span', {'class': 'player-cell-wrapper'})
 for p in players:
     nome = p.find('a').text.strip()
     l = p.find('a').get('href').strip()
-    links = 'https://www.atptour.com' + l[:-8] + 'rankings-breakdown'
+    link_a = 'https://www.atptour.com' + l[:-8] + 'rankings-breakdown'
+    link_b = 'https://www.atptour.com' + l[:-8] + 'player-stats'
+    
     
     stat_giocatori.append({
         'giocatore': nome,
-        'link': links
+        'link_a': link_a,
+        'link_b': link_b
     })
     
     
