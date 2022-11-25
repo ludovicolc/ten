@@ -87,7 +87,7 @@ with col1:
     soup = BeautifulSoup(r.content, 'html.parser')
     
     A_Pts = int(soup.find_all('td')[9].text.strip().replace(',', ''))
-    A_Rank = int(soup.find('td', {'class': 'rank-cell'}).text.strip())
+    A_Rank = int(soup.find('td', {'class': 'rank-cell'}).text.strip().replace('T', ''))
     A_dob = int(soup.find('div', {'class': 'table-big-value'}).text.strip()[:2])
     A_height = int(soup.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
     braccio = soup.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
@@ -116,7 +116,7 @@ with col2:
     soup_2 = BeautifulSoup(r_2.content, 'html.parser')
     
     B_Pts = int(soup_2.find_all('td')[9].text.strip().replace(',', ''))
-    B_Rank = int(soup_2.find('td', {'class': 'rank-cell'}).text.strip())
+    B_Rank = int(soup_2.find('td', {'class': 'rank-cell'}).text.strip().replace('T', ''))
     B_dob = int(soup_2.find('div', {'class': 'table-big-value'}).text.strip()[:2])
     B_height = int(soup_2.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
     braccio_2 = soup_2.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
