@@ -1,7 +1,20 @@
 import pandas as pd
 import joblib
 import streamlit as st
+from bs4 import BeautifulSoup
+import requests
 
+giocatori = pd.read_csv('link_giocatori.csv')
+
+europa =  ['ESP', 'FRA', 'GER', 'RUS', 'ITA', 'AUS', 'CZE', 'CRO',
+       'SRB', 'SUI', 'GBR', 'BEL', 'AUT', 'SVK', 'NED', 'SWE', 'ROU',
+       'FIN', 'POR', 'POL', 'BUL', 'CYP', 'BLR', 'UKR', 'SLO', 'LAT', 'NOR',  'BIH', 'GRE',
+       'GEO', 'LUX', 'DEN', 'HUN', 'LTU', 'MDA', 'EST', 'IRL', 'BAR', 'ESA']
+sud_america= ['ARG', 'BRA', 'COL', 'URU', 'ECU', 'PER', 'CHI', 'BOL', 'MEX', 'PAR']
+nord_america= ['USA', 'CAN']
+africa = ['RSA', 'TUN', 'MAR', 'TUR', 'EGY', 'ALG', 'ZIM']
+asia = ['JPN', 'KAZ', 'UZB', 'ISR', 'IND', 'THA', 'KOR', 'ARM', 'CHN', 'TPE', 'PHI', 'MON', 'PAK']
+oceania = ['NZL']
 
 prev = st.container()
 
@@ -18,6 +31,7 @@ def dati(A_B365, A_Pts, A_Rank, B_B365, B_Pts, B_Rank,
        A_ioc_oceania=0, A_ioc_sud_america=0, B_hand_R=0, B_ioc_asia=0,
        B_ioc_europa=0, B_ioc_nord_america=0, B_ioc_oceania=0,
        B_ioc_sud_america=0):
+    
     d = []
     d.append({
         'A_B365': A_B365,
@@ -65,33 +79,66 @@ def dati(A_B365, A_Pts, A_Rank, B_B365, B_Pts, B_Rank,
 col1, col2, col3 = st.columns(3)
 
 with col1:
+    g1 = st.selectbox(label='Giocatore_1', options=giocatori.giocatore.values)
     A_B365 = st.number_input(label='A_Bet365')
-    A_Pts = st.number_input(label='A_Punti_ATP')
-    A_Rank = st.number_input(label='A_Rank')
-    A_dob = st.number_input(label='A_età')
-    A_height = st.number_input(label='A_altezza')
-    A_hand_R = st.number_input(label='A_destro', value=0)
-    A_ioc_asia = st.number_input(label='A_nazionalità_asia', value=0)
-    A_ioc_europa = st.number_input(label='A_nazionalità_europa', value=0)
-    A_ioc_nord_america = st.number_input(label='A_nazionalità_nord_america', value=0)
-    A_ioc_oceania = st.number_input(label='A_nazionalità_oceania', value=0)
-    A_ioc_sud_america = st.number_input(label='A_nazionalità_sud_america', value=0)
+    
+    url = giocatori.link[giocatori.giocatore == g1].values[0]
+    r = requests.get(url, headers={'User-Agent': ''})
+    soup = BeautifulSoup(r.content, 'html.parser')
+    
+    A_Pts = int(soup.find_all('td')[9].text.strip().replace(',', ''))
+    A_Rank = int(soup.find('td', {'class': 'rank-cell'}).text.strip())
+    A_dob = int(soup.find('div', {'class': 'table-big-value'}).text.strip()[:2])
+    A_height = int(soup.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
+    braccio = soup.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
+    naz = soup.find('div', {'class': 'player-flag-code'}).text.strip()
+    
+    A_hand_R = 1 if braccio == 'R' else 0
+    A_ioc_asia = 1 if naz in asia else 0
+    A_ioc_europa = 1 if naz in europa else 0
+    A_ioc_nord_america = 1 if naz in nord_america else 0
+    A_ioc_oceania = 1 if naz in oceania else 0
+    A_ioc_sud_america = 1 if naz in sud_america else 0
+    
+    st.text(f'Punti ATP: {A_Pts}')
+    st.text(f'Rank: {A_Rank}')
+    st.text(f'Età: {A_dob}')
+    st.text(f'Altezza: {A_height}')
+    st.text(f'''Braccio: {'Destro' if braccio == 'R' else 'Sinistro'}''')
+    st.text(f'''Nazionalità: {'Europa' if naz in europa else 'Asia' if naz in asia else 'Nord America' if naz in nord_america else 'Sud America' if naz in sud_america else 'Oceania' if naz in oceania else 'Africa'}''')
     
 with col2:
+    g2 = st.selectbox(label='Giocatore_2', options=giocatori.giocatore.values)
     B_B365 = st.number_input(label='B_Bet365')
-    B_Pts = st.number_input(label='B_Punti_ATP')
-    B_Rank = st.number_input(label='B_Rank')
-    B_dob = st.number_input(label='B_età')
-    B_height = st.number_input(label='B_altezza')
-    B_hand_R = st.number_input(label='B_destro', value=0)
-    B_ioc_asia = st.number_input(label='B_nazionalità_asia', value=0)
-    B_ioc_europa = st.number_input(label='B_nazionalità_europa', value=0)
-    B_ioc_nord_america = st.number_input(label='B_nazionalità_nord_america', value=0)
-    B_ioc_oceania = st.number_input(label='B_nazionalità_oceania', value=0)
-    B_ioc_sud_america = st.number_input(label='B_nazionalità_sud_america', value=0)
+    
+    url_2 = giocatori.link[giocatori.giocatore == g2].values[0]
+    r_2 = requests.get(url_2, headers={'User-Agent': ''})
+    soup_2 = BeautifulSoup(r_2.content, 'html.parser')
+    
+    B_Pts = int(soup_2.find_all('td')[9].text.strip().replace(',', ''))
+    B_Rank = int(soup_2.find('td', {'class': 'rank-cell'}).text.strip())
+    B_dob = int(soup_2.find('div', {'class': 'table-big-value'}).text.strip()[:2])
+    B_height = int(soup_2.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
+    braccio_2 = soup_2.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
+    naz_2 = soup_2.find('div', {'class': 'player-flag-code'}).text.strip()
+    
+    
+    B_hand_R = 1 if braccio_2 == 'R' else 0
+    B_ioc_asia = 1 if naz_2 in asia else 0
+    B_ioc_europa = 1 if naz_2 in europa else 0
+    B_ioc_nord_america = 1 if naz_2 in nord_america else 0
+    B_ioc_oceania = 1 if naz_2 in oceania else 0
+    B_ioc_sud_america = 1 if naz_2 in sud_america else 0
+    
+    st.text(f'Punti ATP: {B_Pts}')
+    st.text(f'Rank: {B_Rank}')
+    st.text(f'Età: {B_dob}')
+    st.text(f'Altezza: {B_height}')
+    st.text(f'''Braccio: {'Destro' if braccio_2 == 'R' else 'Sinistro'}''')
+    st.text(f'''Nazionalità: {'Europa' if naz_2 in europa else 'Asia' if naz_2 in asia else 'Nord America' if naz_2 in nord_america else 'Sud America' if naz_2 in sud_america else 'Oceania' if naz_2 in oceania else 'Africa'}''')
     
 with col3:
-    Date = st.number_input(label='mese')
+    Date = st.number_input(label='mese', value=0)
     Location_asia = st.number_input(label='luogo_asia', value=0)
     Location_europa = st.number_input(label='luogo_europa', value=0)
     Location_nord_america = st.number_input(label='luogo_nord_america', value=0)
@@ -105,9 +152,9 @@ with col3:
     Round_Semifinals = st.number_input(label='round_semifinali', value=0)
     Round_The_Final = st.number_input(label='round_finale', value=0)
     
-    puntata = st.number_input(label='Puntata', value=0)
+puntata = st.number_input(label='Puntata', value=0)
 
-    prevedere = dati(A_B365=A_B365, A_Pts=A_Pts, A_Rank=A_Rank, B_B365=B_B365, B_Pts=B_Pts, B_Rank=B_Rank, Date=Date, 
+prevedere = dati(A_B365=A_B365, A_Pts=A_Pts, A_Rank=A_Rank, B_B365=B_B365, B_Pts=B_Pts, B_Rank=B_Rank, Date=Date, 
                     A_dob=A_dob, A_height=A_height, B_dob=B_dob, B_height=B_height,
                     Location_asia=Location_asia, Location_europa=Location_europa, Location_nord_america=Location_nord_america,
                     Location_oceania=Location_oceania, Location_sud_america=Location_sud_america, Round_2nd_Round=Round_2nd_Round,
@@ -118,7 +165,7 @@ with col3:
                     B_ioc_europa=B_ioc_europa, B_ioc_nord_america=B_ioc_nord_america, B_ioc_oceania=B_ioc_oceania,
                     B_ioc_sud_america=B_ioc_sud_america)
                     
-    def previsione():
+def previsione():
         outcome = vc.predict_proba(prevedere.reshape(1, -1))
         st.text(f'Giocatore 1: {(round(outcome[0][0]*100, 2))}% | Giocatore 2: {(round(outcome[0][1]*100, 2))}%')
         
@@ -140,4 +187,4 @@ with col3:
         st.text(f'Kelly: {round(kelly*100, 2)}% | Kelly_2: {round(kelly_2*100, 2)}%    Quota 1:{b}')
         st.text(f'Puntata_1: {round(kelly*puntata, 2)} | Puntata_2: {round(kelly_2*puntata, 2)}')
 
-    st.button('Prevedi', on_click=previsione)
+st.button('Prevedi', on_click=previsione)
