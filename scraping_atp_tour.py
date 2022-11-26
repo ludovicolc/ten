@@ -6,23 +6,17 @@ url = 'https://www.atptour.com/en/rankings/singles?rankDate=2022-11-21&countryCo
 r = requests.get(url=url, headers={'User-Agent': ''})
 soup = BeautifulSoup(r.content, 'html.parser')
 
-giocatori = []
+g = []
 players = soup.find_all('span', {'class': 'player-cell-wrapper'})
 for p in players:
     nome = p.find('a').text.strip()
     l = p.find('a').get('href').strip()
-    link_a = 'https://www.atptour.com' + l[:-8] + 'rankings-breakdown'
-    link_b = 'https://www.atptour.com' + l[:-8] + 'player-stats'
+    link = 'https://www.atptour.com' + l[:-8] + 'rankings-breakdown'
     
-    
-    giocatori.append({
+    g.append({
         'giocatore': nome,
-        'link_a': link_a,
-        'link_b': link_b
+        'link': link
     })
-    
-    
 
-l_giocatori = pd.DataFrame(giocatori)
-
-l_giocatori.to_csv('link_giocatori.csv', index=False)
+df = pd.DataFrame(g)
+df.to_csv('link_giocatori.csv', index=False)
