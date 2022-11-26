@@ -4,9 +4,9 @@ import streamlit as st
 from bs4 import BeautifulSoup
 import requests
 
-giocatori = pd.read_csv('link_giocatori.csv')
+giocatori = pd.read_csv('link_giocatori.csv') # database
 
-europa =  ['ESP', 'FRA', 'GER', 'RUS', 'ITA', 'AUS', 'CZE', 'CRO',
+europa =  ['ESP', 'FRA', 'GER', 'RUS', 'ITA', 'CZE', 'CRO',
        'SRB', 'SUI', 'GBR', 'BEL', 'AUT', 'SVK', 'NED', 'SWE', 'ROU',
        'FIN', 'POR', 'POL', 'BUL', 'CYP', 'BLR', 'UKR', 'SLO', 'LAT', 'NOR',  'BIH', 'GRE',
        'GEO', 'LUX', 'DEN', 'HUN', 'LTU', 'MDA', 'EST', 'IRL', 'BAR', 'ESA']
@@ -14,9 +14,7 @@ sud_america= ['ARG', 'BRA', 'COL', 'URU', 'ECU', 'PER', 'CHI', 'BOL', 'MEX', 'PA
 nord_america= ['USA', 'CAN']
 africa = ['RSA', 'TUN', 'MAR', 'TUR', 'EGY', 'ALG', 'ZIM']
 asia = ['JPN', 'KAZ', 'UZB', 'ISR', 'IND', 'THA', 'KOR', 'ARM', 'CHN', 'TPE', 'PHI', 'MON', 'PAK']
-oceania = ['NZL']
-
-prev = st.container()
+oceania = ['NZL', 'AUS']
 
 sc = joblib.load('standard_scaler_joblib')
 vc = joblib.load('vc_clf_joblib')
@@ -77,11 +75,11 @@ def dati(A_B365, B_B365, A_Pts, A_Rank, B_Pts, B_Rank,
     
     return X
 
-col1, col2, col3 = st.columns(3)
-
+st.header('Giocatori')
+col1, col2 = st.columns(2)
 with col1:
-    g1 = st.selectbox(label='Giocatore_1', options=giocatori.giocatore.values)
-    A_B365 = st.number_input(label='Quota_A')
+    g1 = st.selectbox(label='Giocatore A', options=giocatori.giocatore.values)
+    A_B365 = st.number_input(label='Quota A (Bet365)')
     
     url_a = giocatori.link_a[giocatori.giocatore == g1].values[0]
     r_a = requests.get(url_a, headers={'User-Agent': ''})
@@ -116,26 +114,26 @@ with col1:
     st.text(f'Età: {A_dob}')
     st.text(f'Altezza: {A_height}')
     st.text(f'''Braccio: {'Destro' if braccio == 'R' else 'Sinistro'}''')
-    st.text(f'''Nazionalità: {'Europa' if naz in europa else 'Asia' if naz in asia else 'Nord America' if naz in nord_america else 'Sud America' if naz in sud_america else 'Oceania' if naz in oceania else 'Africa'}''')
+    st.text(f'''Continente appartenenza: {'Europa' if naz in europa else 'Asia' if naz in asia else 'Nord America' if naz in nord_america else 'Sud America' if naz in sud_america else 'Oceania' if naz in oceania else 'Africa'}''')
 
 with col2:
-    g2 = st.selectbox(label='Giocatore_2', options=giocatori.giocatore.values)
-    B_B365 = st.number_input(label='Quota_B')
+    g2 = st.selectbox(label='Giocatore B', options=giocatori.giocatore.values)
+    B_B365 = st.number_input(label='Quota B (Bet365)')
     
-    url_a2 = giocatori.link_a[giocatori.giocatore == g2].values[0]
-    r_a2 = requests.get(url_a2, headers={'User-Agent': ''})
-    soup_a2 = BeautifulSoup(r_a2.content, 'html.parser')
+    url_b = giocatori.link_a[giocatori.giocatore == g2].values[0]
+    r_b = requests.get(url_b, headers={'User-Agent': ''})
+    soup_b = BeautifulSoup(r_b.content, 'html.parser')
     
-    B_Pts = int(soup_a2.find_all('td')[9].text.strip().replace(',', ''))
-    B_Rank = int(soup_a2.find('td', {'class': 'rank-cell'}).text.strip().replace('T', ''))
-    B_dob = int(soup_a2.find('div', {'class': 'table-big-value'}).text.strip()[:2])
+    B_Pts = int(soup_b.find_all('td')[9].text.strip().replace(',', ''))
+    B_Rank = int(soup_b.find('td', {'class': 'rank-cell'}).text.strip().replace('T', ''))
+    B_dob = int(soup_b.find('div', {'class': 'table-big-value'}).text.strip()[:2])
     
     try:
-        B_height = int(soup_a2.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
+        B_height = int(soup_b.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
     except:
         B_height = 185
     try:
-        braccio_2 = soup_a2.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
+        braccio_2 = soup_b.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
     except:
         braccio_2 = 'R'
     try:
@@ -155,25 +153,41 @@ with col2:
     st.text(f'Età: {B_dob}')
     st.text(f'Altezza: {B_height}')
     st.text(f'''Braccio: {'Destro' if braccio_2 == 'R' else 'Sinistro'}''')
-    st.text(f'''Nazionalità: {'Europa' if naz_2 in europa else 'Asia' if naz_2 in asia else 'Nord America' if naz_2 in nord_america else 'Sud America' if naz_2 in sud_america else 'Oceania' if naz_2 in oceania else 'Africa'}''')
+    st.text(f'''Continente appartenenza: {'Europa' if naz_2 in europa else 'Asia' if naz_2 in asia else 'Nord America' if naz_2 in nord_america else 'Sud America' if naz_2 in sud_america else 'Oceania' if naz_2 in oceania else 'Africa'}''')
     
-with col3:
-    Date = st.number_input(label='mese', value=0)
-    Location_asia = st.number_input(label='luogo_asia', value=0)
-    Location_europa = st.number_input(label='luogo_europa', value=0)
-    Location_nord_america = st.number_input(label='luogo_nord_america', value=0)
-    Location_oceania = st.number_input(label='luogo_oceania', value=0)
-    Location_sud_america = st.number_input(label='luogo_sud_america', value=0)
-    Round_2nd_Round = st.number_input(label='round_2', value=0)
-    Round_3rd_Round = st.number_input(label='round_3', value=0)
-    Round_4th_Round = st.number_input(label='round_4', value=0)
-    Round_Quarterfinals = st.number_input(label='round_quarti_di_finale', value=0)
-    Round_Round_Robin = st.number_input(label='round_robin', value=0)
-    Round_Semifinals = st.number_input(label='round_semifinali', value=0)
-    Round_The_Final = st.number_input(label='round_finale', value=0)
+st.header('Torneo')
+Date = st.number_input(label='Mese', value=0)
+
+st.subheader('Continente')
+col_ca, col_cb, col_cc = st.columns(3)
+with col_ca:
+    Location_asia = st.number_input(label='Asia', value=0)
+    Location_europa = st.number_input(label='Europa', value=0)
+with col_cb:    
+    Location_nord_america = st.number_input(label='Nord America', value=0)
+    Location_oceania = st.number_input(label='Oceania', value=0)
+with col_cc:
+    Location_sud_america = st.number_input(label='Sud America', value=0)
+
+st.subheader('Round')
+col_ra, col_rb, col_rc, col_rd = st.columns(4)
+with col_ra:
+    Round_2nd_Round = st.number_input(label='Round 2', value=0)
+    Round_Round_Robin = st.number_input(label='Round robin', value=0)
+with col_rb:
+    Round_3rd_Round = st.number_input(label='Round 3', value=0)
+    Round_Semifinals = st.number_input(label='Semifinali', value=0)
+with col_rc:
+    Round_4th_Round = st.number_input(label='Round 4', value=0)
+    Round_The_Final = st.number_input(label='Finale', value=0)
+with col_rd:
+    Round_Quarterfinals = st.number_input(label='Quarti di finale', value=0)
+
+st.subheader('Puntata')
+with st.container():
+    puntata = st.number_input(label='Puntata', value=0)
     
     
-puntata = st.number_input(label='Puntata', value=0)
 
 prevedere = dati(A_B365=A_B365, B_B365=B_B365, A_Pts=A_Pts, A_Rank=A_Rank, B_Pts=B_Pts, B_Rank=B_Rank, Date=Date, 
                 A_dob=A_dob, A_height=A_height, B_dob=B_dob, B_height=B_height,
@@ -186,7 +200,6 @@ prevedere = dati(A_B365=A_B365, B_B365=B_B365, A_Pts=A_Pts, A_Rank=A_Rank, B_Pts
                 B_ioc_europa=B_ioc_europa, B_ioc_nord_america=B_ioc_nord_america,
                 B_ioc_sud_america=B_ioc_sud_america, B_ioc_oceania=B_ioc_oceania
                 )
-
 
 def previsione():
         outcome = vc.predict_proba(prevedere.reshape(1, -1))
@@ -206,7 +219,7 @@ def previsione():
         
         kelly = (b*p - q) / b
         
-        st.text(f'Kelly: {round(kelly*100, 2)}%  |  Quota 1:{b}')
+        st.text(f'Kelly: {round(kelly*100, 2)}%  |  Quota:{b}')
         st.text(f'Puntata: {round(kelly*puntata, 2)}')
 
 st.button('Prevedi', on_click=previsione)

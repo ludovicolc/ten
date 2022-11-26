@@ -6,7 +6,7 @@ url = 'https://www.atptour.com/en/rankings/singles?rankDate=2022-11-21&countryCo
 r = requests.get(url=url, headers={'User-Agent': ''})
 soup = BeautifulSoup(r.content, 'html.parser')
 
-stat_giocatori = []
+giocatori = []
 players = soup.find_all('span', {'class': 'player-cell-wrapper'})
 for p in players:
     nome = p.find('a').text.strip()
@@ -15,7 +15,7 @@ for p in players:
     link_b = 'https://www.atptour.com' + l[:-8] + 'player-stats'
     
     
-    stat_giocatori.append({
+    giocatori.append({
         'giocatore': nome,
         'link_a': link_a,
         'link_b': link_b
@@ -23,6 +23,6 @@ for p in players:
     
     
 
-df_stat_p = pd.DataFrame(stat_giocatori)
+l_giocatori = pd.DataFrame(giocatori)
 
-df_stat_p.to_csv('link_giocatori.csv', index=False)
+l_giocatori.to_csv('link_giocatori.csv', index=False)
