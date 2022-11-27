@@ -75,27 +75,6 @@ africa = ['RSA', 'TUN', 'MAR', 'TUR', 'EGY', 'ALG', 'ZIM']
 asia = ['JPN', 'KAZ', 'UZB', 'ISR', 'IND', 'THA', 'KOR', 'ARM', 'CHN', 'TPE', 'PHI', 'MON', 'PAK']
 oceania = ['NZL', 'AUS']
 
-def previsione():
-        outcome = vc.predict_proba(prevedere.reshape(1, -1))
-        st.text(f'Giocatore 1: {(round(outcome[0][0]*100, 2))}% | Giocatore 2: {(round(outcome[0][1]*100, 2))}%')
-        
-        if outcome[0][0] > outcome[0][1]: # probabilità vittoria
-            b = a_b365
-        else:
-            b = b_b365
-            
-        if outcome[0][0] > outcome[0][1]: # probabilità vittoria
-            p = outcome[0][0]
-        else:
-            p = outcome[0][1]
-        
-        q = 1 - p # probabilità sconfitta
-        
-        kelly = (b*p - q) / b
-        
-        st.text(f'Kelly: {round(kelly*100, 2)}%  |  Quota:{b}')
-        st.text(f'Puntata: {round(kelly*puntata, 2)}')
-
 
 st.header('Giocatori')
 col1, col2 = st.columns(2)
@@ -205,7 +184,7 @@ with col_rc:
 with col_rd:
     round_quarterfinals = st.number_input(label='Quarti di finale', value=0)
 
-st.subheader('Puntata')
+st.header('Puntata')
 with st.container():
     puntata = st.number_input(label='Puntata', value=0)
     
@@ -222,4 +201,64 @@ prevedere = dati(a_b365=a_b365, b_b365=b_b365, a_pts=a_pts, a_rank=a_rank, b_pts
                 b_ioc_sud_america=b_ioc_sud_america, b_ioc_oceania=b_ioc_oceania
                 )
 
-st.button('Prevedi', on_click=previsione)
+
+if 'giocat' not in st.session_state:
+    st.session_state.giocat = []
+if 'pr_vit' not in st.session_state:
+    st.session_state.pr_vit = []
+if 'kel' not in st.session_state:
+    st.session_state.kel = []
+if 'punt' not in st.session_state:
+    st.session_state.punt = []
+if 'quot' not in st.session_state:
+    st.session_state.quot = []
+if 'val_at' not in st.session_state:
+    st.session_state.val_at = []
+
+df = pd.DataFrame({
+            'Giocatore': st.session_state.giocat,
+            'Probabilità vittoria': st.session_state.pr_vit,
+            'Kelly': st.session_state.kel,
+            'Puntata': st.session_state.punt,
+            'Quota': st.session_state.quot,
+            'Valore atteso': st.session_state.val_at
+            })
+
+hide_table_row_index = """
+            <style>
+            thead tr th:first-child {display:none}
+            tbody th {display:none}
+            </style>
+            """
+st.markdown(hide_table_row_index, unsafe_allow_html=True)
+
+tabella = st.table(df.sort_values(by='Kelly', ascending=False))
+    
+        
+def previsione():
+        outcome = vc.predict_proba(prevedere.reshape(1, -1))
+        
+        if outcome[0][0] > outcome[0][1]: # probabilità vittoria
+            b = a_b365
+        else:
+            b = b_b365
+            
+        if outcome[0][0] > outcome[0][1]: # probabilità vittoria
+            p = outcome[0][0]
+            st.session_state.giocat.append(g1)
+        else:
+            p = outcome[0][1]
+            st.session_state.giocat.append(g2)
+        
+        q = 1 - p # probabilità sconfitta
+        kelly = ((b * p) - q) / b
+        kel_p = kelly*puntata
+        va = p * b * kel_p
+        
+        st.session_state.pr_vit.append(f'{round(p*100, 2)}%')
+        st.session_state.kel.append(f'{round(kelly*100, 2)}%')
+        st.session_state.punt.append(f'{round(kel_p, 2)}')
+        st.session_state.quot.append(f'{round(b, 2)}')
+        st.session_state.val_at.append(f'{round(va, 2)}')
+
+prevedi = st.button('Prevedi', on_click=previsione)
