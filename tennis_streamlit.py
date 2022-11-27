@@ -253,7 +253,7 @@ def previsione():
         q = 1 - p # probabilità sconfitta
         kelly = ((b * p) - q) / b
         kel_p = kelly*puntata
-        va = p * b * kel_p
+        va = (p * b * kel_p) - (kel_p * q)
         
         st.session_state.pr_vit.append(f'{round(p*100, 2)}%')
         st.session_state.kel.append(f'{round(kelly*100, 2)}%')
