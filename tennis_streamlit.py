@@ -219,9 +219,9 @@ df = pd.DataFrame({
             'Giocatore': st.session_state.giocat,
             'Probabilità vittoria': st.session_state.pr_vit,
             'Kelly': st.session_state.kel,
-            'Puntata': st.session_state.punt,
             'Quota': st.session_state.quot,
-            'Valore atteso': st.session_state.val_at
+            'Valore atteso': st.session_state.val_at,
+            'Puntata': st.session_state.punt,
             })
 
 hide_table_row_index = """

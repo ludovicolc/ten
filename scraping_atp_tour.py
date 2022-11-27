@@ -2,7 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-url = 'https://www.atptour.com/en/rankings/singles?rankDate=2022-11-21&countryCode=all&rankRange=1-1400'
+numero_giocatori = 2000
+url = f'https://www.atptour.com/en/rankings/singles?rankDate=2022-11-21&countryCode=all&rankRange=1-{numero_giocatori}'
 r = requests.get(url=url, headers={'User-Agent': ''})
 soup = BeautifulSoup(r.content, 'html.parser')
 
