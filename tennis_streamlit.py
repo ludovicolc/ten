@@ -88,16 +88,18 @@ with col1:
     
     a_pts = int(soup_a.find_all('td')[9].text.strip().replace(',', ''))
     a_rank = int(soup_a.find('td', {'class': 'rank-cell'}).text.strip().replace('T', ''))
-    a_dob = int(soup_a.find('div', {'class': 'table-big-value'}).text.strip()[:2])
-    
+    try:
+        a_dob = int(soup_a.find('div', {'class': 'table-big-value'}).text.strip()[:2])
+    except:
+        a_dob = 27  # mediana
     try:
         a_height = int(soup_a.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
     except:
-        a_height = 185
+        a_height = 185  # mediana
     try:
         braccio = soup_a.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
     except:
-        braccio = 'R'
+        braccio = 'R'  # moda
     try:
         naz = soup_a.find('div', {'class': 'player-flag-code'}).text.strip()
     except:
@@ -127,16 +129,19 @@ with col2:
     
     b_pts = int(soup_b.find_all('td')[9].text.strip().replace(',', ''))
     b_rank = int(soup_b.find('td', {'class': 'rank-cell'}).text.strip().replace('T', ''))
-    b_dob = int(soup_b.find('div', {'class': 'table-big-value'}).text.strip()[:2])
     
+    try:
+        b_dob = int(soup_b.find('div', {'class': 'table-big-value'}).text.strip()[:2])
+    except:
+        b_dob = 27  # mediana
     try:
         b_height = int(soup_b.find('span', {'class': 'table-height-cm-wrapper'}).text.strip()[1:-3])
     except:
-        b_height = 185
+        b_height = 185  # mediana
     try:
         braccio_2 = soup_b.find_all('div', {'class': 'table-value'})[1].text.strip()[0]
     except:
-        braccio_2 = 'R'
+        braccio_2 = 'R'  # moda
     try:
         naz_2 = soup_a.find('div', {'class': 'player-flag-code'}).text.strip()
     except:
