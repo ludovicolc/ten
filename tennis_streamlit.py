@@ -6,10 +6,10 @@ import requests
 
 giocatori = pd.read_csv('link_giocatori.csv')
 
-sc = joblib.load('standard_scaler_joblib')
-vc = joblib.load('vc_clf_joblib')
+sca = joblib.load('standard_scaler_b_joblib')
+vc = joblib.load('vc_b_clf_joblib')
 
-def dati(a_b365, b_b365, a_pts, a_rank, b_pts, b_rank,
+def dati(a_pts, a_rank, b_pts, b_rank,
         date, a_dob, a_height, b_dob, b_height, 
         location_asia=0, location_europa=0, location_nord_america=0,
         location_oceania=0, location_sud_america=0, round_2nd_round=0,
@@ -20,7 +20,9 @@ def dati(a_b365, b_b365, a_pts, a_rank, b_pts, b_rank,
         b_ioc_europa=0, b_ioc_nord_america=0, b_ioc_oceania=0,
         b_ioc_sud_america=0):
     
-    diff_bet = a_b365 - b_b365
+    diff_pts = a_pts - b_pts
+    diff_rank = a_rank - b_rank
+    diff_dob = a_dob - b_dob
     
     d = []
     d.append({
@@ -33,7 +35,9 @@ def dati(a_b365, b_b365, a_pts, a_rank, b_pts, b_rank,
         'a_height': a_height,
         'b_dob': b_dob,
         'b_height': b_height,
-        'diff_bet': diff_bet,
+        'diff_pts': diff_pts,
+        'diff_rank': diff_rank,
+        'diff_dob': diff_dob,
         'location_asia': location_asia,
         'location_europa': location_europa,
         'location_nord_america': location_nord_america,
@@ -61,7 +65,7 @@ def dati(a_b365, b_b365, a_pts, a_rank, b_pts, b_rank,
     })
     
     df = pd.DataFrame(d)
-    X = sc.transform(df)
+    X = sca.transform(df)
     
     return X
 
@@ -194,7 +198,7 @@ with st.container():
     puntata = st.number_input(label='Puntata', value=0)
     
     
-prevedere = dati(a_b365=a_b365, b_b365=b_b365, a_pts=a_pts, a_rank=a_rank, b_pts=b_pts, b_rank=b_rank, date=date, 
+prevedere = dati(a_pts=a_pts, a_rank=a_rank, b_pts=b_pts, b_rank=b_rank, date=date, 
                 a_dob=a_dob, a_height=a_height, b_dob=b_dob, b_height=b_height,
                 location_asia=location_asia, location_europa=location_europa, location_nord_america=location_nord_america,
                 location_oceania=location_oceania, location_sud_america=location_sud_america, round_2nd_round=round_2nd_round,
@@ -209,6 +213,8 @@ prevedere = dati(a_b365=a_b365, b_b365=b_b365, a_pts=a_pts, a_rank=a_rank, b_pts
 
 if 'giocat' not in st.session_state:
     st.session_state.giocat = []
+if 'pr_vit_b365' not in st.session_state:
+    st.session_state.pr_vit_b365 = []
 if 'pr_vit' not in st.session_state:
     st.session_state.pr_vit = []
 if 'kel' not in st.session_state:
@@ -222,6 +228,7 @@ if 'val_at' not in st.session_state:
 
 df = pd.DataFrame({
             'Giocatore': st.session_state.giocat,
+            'Probabilità vittoria Bet365': st.session_state.pr_vit_b365,
             'Probabilità vittoria': st.session_state.pr_vit,
             'Kelly': st.session_state.kel,
             'Quota': st.session_state.quot,
@@ -245,8 +252,10 @@ def previsione():
         
         if outcome[0][0] > outcome[0][1]: # probabilità vittoria
             b = a_b365
+            p_bet = 1 / a_b365
         else:
             b = b_b365
+            p_bet = 1 / b_b365
             
         if outcome[0][0] > outcome[0][1]: # probabilità vittoria
             p = outcome[0][0]
@@ -260,6 +269,7 @@ def previsione():
         kel_p = kelly*puntata
         va = (p * b * kel_p) - (kel_p * q)
         
+        st.session_state.pr_vit_b365.append(f'{round(p_bet*100, 2)}%')
         st.session_state.pr_vit.append(f'{round(p*100, 2)}%')
         st.session_state.kel.append(f'{round(kelly*100, 2)}%')
         st.session_state.punt.append(f'{round(kel_p, 2)}')
