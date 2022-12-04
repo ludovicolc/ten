@@ -1,9 +1,13 @@
 import pandas as pd
 import joblib
 
+
+# StandardScaler e Modello
 sca = joblib.load('standard_scaler_b_joblib')
 vc = joblib.load('vc_b_clf_joblib')
 
+
+# nazioni per continente
 europa =  ['ESP', 'FRA', 'GER', 'RUS', 'ITA', 'CZE', 'CRO',
        'SRB', 'SUI', 'GBR', 'BEL', 'AUT', 'SVK', 'NED', 'SWE', 'ROU',
        'FIN', 'POR', 'POL', 'BUL', 'CYP', 'BLR', 'UKR', 'SLO', 'LAT', 'NOR',  'BIH', 'GRE',
@@ -14,6 +18,8 @@ africa = ['RSA', 'TUN', 'MAR', 'TUR', 'EGY', 'ALG', 'ZIM']
 asia = ['JPN', 'KAZ', 'UZB', 'ISR', 'IND', 'THA', 'KOR', 'ARM', 'CHN', 'TPE', 'PHI', 'MON', 'PAK']
 oceania = ['NZL', 'AUS']
 
+
+# funzione per riorganizzare i dati inseriti
 def dati(a_b365, b_b365, a_pts, a_rank, b_pts, b_rank,
         date, a_dob, a_height, b_dob, b_height, 
         location_asia=0, location_europa=0, location_nord_america=0,

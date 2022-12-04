@@ -1,5 +1,4 @@
 import pandas as pd
-import joblib
 import streamlit as st
 from bs4 import BeautifulSoup
 import requests
@@ -57,7 +56,8 @@ with col1:
     st.text(f'Età: {a_dob}')
     st.text(f'Altezza: {a_height}')
     st.text(f'''Braccio: {'Destro' if braccio == 'R' else 'Sinistro'}''')
-    st.text(f'''Continente appartenenza: {'Europa' if naz in europa else 'Asia' if naz in asia else 'Nord America' if naz in nord_america else 'Sud America' if naz in sud_america else 'Oceania' if naz in oceania else 'Africa'}''')
+    st.text(f'''Continente appartenenza: {'Europa' if naz in europa else 'Asia' if naz in asia else 'Nord America' if naz in nord_america
+            else 'Sud America' if naz in sud_america else 'Oceania' if naz in oceania else 'Africa'}''')
 
 with col2:
     g2 = st.selectbox(label='Giocatore B', options=giocatori.giocatore.values)
@@ -99,35 +99,61 @@ with col2:
     st.text(f'Età: {b_dob}')
     st.text(f'Altezza: {b_height}')
     st.text(f'''Braccio: {'Destro' if braccio_2 == 'R' else 'Sinistro'}''')
-    st.text(f'''Continente appartenenza: {'Europa' if naz_2 in europa else 'Asia' if naz_2 in asia else 'Nord America' if naz_2 in nord_america else 'Sud America' if naz_2 in sud_america else 'Oceania' if naz_2 in oceania else 'Africa'}''')
+    st.text(f'''Continente appartenenza: {'Europa' if naz_2 in europa else 'Asia' if naz_2 in asia else 'Nord America' if naz_2 in nord_america
+            else 'Sud America' if naz_2 in sud_america else 'Oceania' if naz_2 in oceania else 'Africa'}''')
     
 st.header('Torneo')
-date = st.number_input(label='Mese', value=0)
-
-st.subheader('Continente')
 col_ca, col_cb, col_cc = st.columns(3)
 with col_ca:
-    location_asia = st.number_input(label='Asia', value=0)
-    location_europa = st.number_input(label='Europa', value=0)
-with col_cb:    
-    location_nord_america = st.number_input(label='Nord America', value=0)
-    location_oceania = st.number_input(label='Oceania', value=0)
+    date = st.selectbox(label='Mese', options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+with col_cb:
+    continente = st.selectbox(label='Continente', options=['Asia', 'Europa', 'Nord America', 'Sud America', 'Oceania', 'Africa'])
 with col_cc:
-    location_sud_america = st.number_input(label='Sud America', value=0)
+    round_ = st.selectbox(label='Round', options=['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Quarti di finale', 'Round robin', 'Semifinale', 'Finale'])
 
-st.subheader('Round')
-col_ra, col_rb, col_rc, col_rd = st.columns(4)
-with col_ra:
-    round_2nd_round = st.number_input(label='Round 2', value=0)
-    round_round_robin = st.number_input(label='Round robin', value=0)
-with col_rb:
-    round_3rd_round = st.number_input(label='Round 3', value=0)
-    round_semifinals = st.number_input(label='Semifinali', value=0)
-with col_rc:
-    round_4th_round = st.number_input(label='Round 4', value=0)
-    round_the_final = st.number_input(label='Finale', value=0)
-with col_rd:
-    round_quarterfinals = st.number_input(label='Quarti di finale', value=0)
+
+# Location
+location_asia = 1 if continente == 'Asia' else 0
+location_europa = 1 if continente == 'Europa' else 0
+location_nord_america = 1 if continente == 'Nord America' else 0
+location_oceania = 1 if continente == 'Sud America' else 0
+location_sud_america = 1 if continente == 'Oceania' else 0
+    
+# Round
+round_2nd_round = 1 if round_ == 'Round 2' else 0
+round_3rd_round = 1 if round_ == 'Round 3' else 0
+round_4th_round = 1 if round_ == 'Round 4' else 0
+round_quarterfinals = 1 if round_ == 'Quarti di finale' else 0
+round_round_robin = 1 if round_ == 'Round robin' else 0
+round_semifinals = 1 if round_ == 'Semifinale' else 0
+round_the_final = 1 if round_ == 'Finale' else 0
+
+
+#st.subheader('Continente')
+#col_ca, col_cb, col_cc = st.columns(3)
+#with col_ca:
+ #   location_asia = st.number_input(label='Asia', value=0)
+  #  location_europa = st.number_input(label='Europa', value=0)
+#with col_cb:    
+ #   location_nord_america = st.number_input(label='Nord America', value=0)
+  #  location_oceania = st.number_input(label='Oceania', value=0)
+#with col_cc:
+ #   location_sud_america = st.number_input(label='Sud America', value=0)
+
+#st.subheader('Round')
+#col_ra, col_rb, col_rc, col_rd = st.columns(4)
+#with col_ra:
+  #  round_2nd_round = st.number_input(label='Round 2', value=0)
+ #   round_round_robin = st.number_input(label='Round robin', value=0)
+#with col_rb:
+  #  round_3rd_round = st.number_input(label='Round 3', value=0)
+ #   round_semifinals = st.number_input(label='Semifinali', value=0)
+#with col_rc:
+  #  round_4th_round = st.number_input(label='Round 4', value=0)
+ #   round_the_final = st.number_input(label='Finale', value=0)
+#with col_rd:
+#    round_quarterfinals = st.number_input(label='Quarti di finale', value=0)
+
 
 st.header('Puntata')
 with st.container():
@@ -164,9 +190,9 @@ if 'val_at' not in st.session_state:
 
 df = pd.DataFrame({
             'Giocatore': st.session_state.giocat,
-            'Probabilità vittoria Bet365': st.session_state.pr_vit_b365,
-            'Probabilità vittoria': st.session_state.pr_vit,
-            'Kelly': st.session_state.kel,
+            'Probabilità di vittoria Bet365': st.session_state.pr_vit_b365,
+            'Probabilità di vittoria calcolata': st.session_state.pr_vit,
+            '% Kelly': st.session_state.kel,
             'Quota': st.session_state.quot,
             'Valore atteso': st.session_state.val_at,
             'Puntata': st.session_state.punt,
@@ -180,9 +206,9 @@ hide_table_row_index = """
             """
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
-tabella = st.table(df.sort_values(by='Kelly', ascending=False))
+tabella = st.table(df.sort_values(by='% Kelly', ascending=False))
     
-        
+
 def previsione():
         outcome = vc.predict_proba(prevedere.reshape(1, -1))
         
