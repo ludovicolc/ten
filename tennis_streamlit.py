@@ -129,32 +129,6 @@ round_semifinals = 1 if round_ == 'Semifinale' else 0
 round_the_final = 1 if round_ == 'Finale' else 0
 
 
-#st.subheader('Continente')
-#col_ca, col_cb, col_cc = st.columns(3)
-#with col_ca:
- #   location_asia = st.number_input(label='Asia', value=0)
-  #  location_europa = st.number_input(label='Europa', value=0)
-#with col_cb:    
- #   location_nord_america = st.number_input(label='Nord America', value=0)
-  #  location_oceania = st.number_input(label='Oceania', value=0)
-#with col_cc:
- #   location_sud_america = st.number_input(label='Sud America', value=0)
-
-#st.subheader('Round')
-#col_ra, col_rb, col_rc, col_rd = st.columns(4)
-#with col_ra:
-  #  round_2nd_round = st.number_input(label='Round 2', value=0)
- #   round_round_robin = st.number_input(label='Round robin', value=0)
-#with col_rb:
-  #  round_3rd_round = st.number_input(label='Round 3', value=0)
- #   round_semifinals = st.number_input(label='Semifinali', value=0)
-#with col_rc:
-  #  round_4th_round = st.number_input(label='Round 4', value=0)
- #   round_the_final = st.number_input(label='Finale', value=0)
-#with col_rd:
-#    round_quarterfinals = st.number_input(label='Quarti di finale', value=0)
-
-
 st.header('Puntata')
 with st.container():
     puntata = st.number_input(label='Puntata', value=0)
