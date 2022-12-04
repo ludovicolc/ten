@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import requests
 import supporto
 
+
+# Componenti di base
 giocatori = pd.read_csv('link_giocatori.csv')
 vc = supporto.vc
 
@@ -14,7 +16,7 @@ africa = supporto.africa
 asia = supporto.asia
 oceania = supporto.oceania
 
-
+# Struttura pagina
 st.header('Giocatori')
 col1, col2 = st.columns(2)
 with col1:
@@ -111,15 +113,19 @@ with col_cb:
 with col_cc:
     round_ = st.selectbox(label='Round', options=['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Quarti di finale', 'Round robin', 'Semifinale', 'Finale'])
 
+st.header('Puntata')
+with st.container():
+    puntata = st.number_input(label='Puntata', value=0)
+    
 
-# Location
+# Trasformazione location torneo
 location_asia = 1 if continente == 'Asia' else 0
 location_europa = 1 if continente == 'Europa' else 0
 location_nord_america = 1 if continente == 'Nord America' else 0
 location_oceania = 1 if continente == 'Sud America' else 0
 location_sud_america = 1 if continente == 'Oceania' else 0
-    
-# Round
+
+# Trasformazione round torneo
 round_2nd_round = 1 if round_ == 'Round 2' else 0
 round_3rd_round = 1 if round_ == 'Round 3' else 0
 round_4th_round = 1 if round_ == 'Round 4' else 0
@@ -129,24 +135,7 @@ round_semifinals = 1 if round_ == 'Semifinale' else 0
 round_the_final = 1 if round_ == 'Finale' else 0
 
 
-st.header('Puntata')
-with st.container():
-    puntata = st.number_input(label='Puntata', value=0)
-    
-    
-prevedere = supporto.dati(a_b365=a_b365, b_b365=b_b365,a_pts=a_pts, a_rank=a_rank, b_pts=b_pts, b_rank=b_rank, date=date, 
-                a_dob=a_dob, a_height=a_height, b_dob=b_dob, b_height=b_height,
-                location_asia=location_asia, location_europa=location_europa, location_nord_america=location_nord_america,
-                location_oceania=location_oceania, location_sud_america=location_sud_america, round_2nd_round=round_2nd_round,
-                round_3rd_round=round_3rd_round, round_4th_round=round_4th_round, round_quarterfinals=round_quarterfinals,
-                round_round_robin=0, round_semifinals=0, round_the_final=round_the_final,
-                a_hand_R=a_hand_R, a_ioc_asia=a_ioc_asia, a_ioc_europa=a_ioc_europa, a_ioc_nord_america=a_ioc_nord_america,
-                a_ioc_sud_america=a_ioc_sud_america, a_ioc_oceania=a_ioc_oceania, b_hand_R=b_hand_R, b_ioc_asia=b_ioc_asia,
-                b_ioc_europa=b_ioc_europa, b_ioc_nord_america=b_ioc_nord_america,
-                b_ioc_sud_america=b_ioc_sud_america, b_ioc_oceania=b_ioc_oceania
-                )
-
-
+# Tabella dinamica
 if 'giocat' not in st.session_state:
     st.session_state.giocat = []
 if 'pr_vit_b365' not in st.session_state:
@@ -182,6 +171,19 @@ st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
 tabella = st.table(df.sort_values(by='% Kelly', ascending=False))
     
+
+# Elaborazione dati
+prevedere = supporto.dati(a_b365=a_b365, b_b365=b_b365,a_pts=a_pts, a_rank=a_rank, b_pts=b_pts, b_rank=b_rank, date=date, 
+                a_dob=a_dob, a_height=a_height, b_dob=b_dob, b_height=b_height,
+                location_asia=location_asia, location_europa=location_europa, location_nord_america=location_nord_america,
+                location_oceania=location_oceania, location_sud_america=location_sud_america, round_2nd_round=round_2nd_round,
+                round_3rd_round=round_3rd_round, round_4th_round=round_4th_round, round_quarterfinals=round_quarterfinals,
+                round_round_robin=0, round_semifinals=0, round_the_final=round_the_final,
+                a_hand_R=a_hand_R, a_ioc_asia=a_ioc_asia, a_ioc_europa=a_ioc_europa, a_ioc_nord_america=a_ioc_nord_america,
+                a_ioc_sud_america=a_ioc_sud_america, a_ioc_oceania=a_ioc_oceania, b_hand_R=b_hand_R, b_ioc_asia=b_ioc_asia,
+                b_ioc_europa=b_ioc_europa, b_ioc_nord_america=b_ioc_nord_america,
+                b_ioc_sud_america=b_ioc_sud_america, b_ioc_oceania=b_ioc_oceania
+                )
 
 def previsione():
         outcome = vc.predict_proba(prevedere.reshape(1, -1))
